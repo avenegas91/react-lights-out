@@ -34,11 +34,20 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
   function createBoard() {
     let initialBoard = [];
     // TODO: create array-of-arrays of true/false values
+    for (let i = 0; i < nrows; i++) {
+      const row = [];
+      for (let j = 0; j < ncols; j ++) {
+        let val = Math.random() < chanceLightStartsOn ? true : false;
+        row.push(val);
+      }
+      initialBoard.push(row);
+    }
     return initialBoard;
   }
 
   function hasWon() {
-    // TODO: check the board in state to determine whether the player has won.
+    // TODO: check the board in state to determine whether the player has won. DONE
+    return board.every(row => row.every(cell => !cell));
   }
 
   function flipCellsAround(coord) {
@@ -53,21 +62,61 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
         }
       };
 
-      // TODO: Make a (deep) copy of the oldBoard
+      // TODO: Make a (deep) copy of the oldBoard (DONE)
 
-      // TODO: in the copy, flip this cell and the cells around it
+      // TODO: in the copy, flip this cell and the cells around it (DONE)
 
-      // TODO: return the copy
+      // TODO: return the copy (DONE)
+      const boardCopy = oldBoard.map(row => [...row]);
+
+      flipCell(y, x, boardCopy);
+      flipCell(y, x - 1, boardCopy);
+      flipCell(y, x + 1, boardCopy);
+      flipCell(y - 1, x, boardCopy);
+      flipCell(y + 1, x, boardCopy);
+
+      return boardCopy;
     });
   }
 
   // if the game is won, just show a winning msg & render nothing else
 
   // TODO
+  if (hasWon()) {
+    return <h1>YOU ARE A WINNER!</h1>;
+  }
 
   // make table board
 
-  // TODO
+  // TODO (DONE)
+  let tableBoard = [];
+
+  for (let y = 0; y < nrows; y++) {
+    let row = [];
+    for (let x = 0; x < ncols; x++) {
+      let coord = `${y}-${x}`;
+      row.push(
+        <Cell
+            key = {coord}
+            isLit = {board[y][x]}
+            flipCellsAroundMe={evt => flipCellsAround(coord)}
+        />,
+      );
+    }
+    tableBoard.push(<tr key={y}>{row}</tr>);
+  }
+
+  return (
+    <table className="Board">
+      <tbody>{tableBoard}</tbody>
+    </table>
+  );
 }
 
 export default Board;
+
+Board.defaultProps = {
+  nrows: 3,
+  ncols: 3, 
+  chanceLightStartsOn: 0.3
+}
